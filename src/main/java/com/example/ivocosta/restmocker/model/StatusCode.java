@@ -1,7 +1,7 @@
 package com.example.ivocosta.restmocker.model;
 
 /**
- * Created by ivo.costa@estafet.com on 09/02/2017.
+ * Created by Ivo Costa on 09/02/2017.
  */
 public enum StatusCode {
     OK(200), NOT_FOUND(404);

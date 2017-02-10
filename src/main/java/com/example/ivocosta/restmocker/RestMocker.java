@@ -1,46 +1,43 @@
 package com.example.ivocosta.restmocker;
 
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.glassfish.jersey.process.Inflector;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.server.model.Resource;
+import io.undertow.Handlers;
+import io.undertow.Undertow;
+import io.undertow.server.handlers.PathHandler;
+import io.undertow.servlet.Servlets;
+import io.undertow.servlet.api.DeploymentInfo;
+import io.undertow.servlet.api.DeploymentManager;
+import io.undertow.servlet.api.InstanceFactory;
 import org.glassfish.jersey.servlet.ServletContainer;
 
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Application;
 
 /**
- * Created by ivo.costa@estafet.com on 09/02/2017.
+ * Created by Ivo Costa on 09/02/2017.
  */
 public class RestMocker {
-    public static void main(String args[]) throws Exception{
-        Server server = new Server(9999);
+    public static void main(String args[]) throws Exception {
 
-        ResourceConfig config = new ResourceConfig();
+        DeploymentInfo servletBuilder = Servlets.deployment();
 
-        Resource.Builder resourceBuilder = Resource.builder("rest");
-        resourceBuilder.addChildResource("test").addMethod("get").handledBy(new Inflector<ContainerRequestContext, Response>() {
-            public Response apply(ContainerRequestContext containerRequestContext) {
-                return Response.ok("I'm here").build();
-            }
-        });
+        InstanceFactory<ServletContainer> factory = new RestServletFactory();
 
-        config.registerResources(resourceBuilder.build());
+        servletBuilder
+                .setClassLoader(Application.class.getClassLoader())
+                .setContextPath("/mss")
+                .setDeploymentName("mss.war")
+                .addServlets(Servlets.servlet("jerseyServlet", ServletContainer.class, factory)
+                        .setLoadOnStartup(1)
+                        .addMapping("/api/*"));
 
-        ServletHolder servletHolder = new ServletHolder(new ServletContainer(config));
+        DeploymentManager manager = Servlets.defaultContainer().addDeployment(servletBuilder);
+        manager.deploy();
+        PathHandler path = Handlers.path(Handlers.redirect("/mss"))
+                .addPrefixPath("/mss", manager.start());
 
-        ServletContextHandler contextHandler = new ServletContextHandler(server, "/*");
-        contextHandler.addServlet(servletHolder, "/*");
+        Undertow server = Undertow.builder().addHttpListener(9999, "localhost")
+                .setHandler(path).build();
 
 
-        try {
-            server.start();
-            server.join();
-        } finally {
-            server.stop();
-        }
-
+        server.start();
     }
 }
