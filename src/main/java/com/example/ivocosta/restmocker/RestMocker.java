@@ -1,5 +1,6 @@
 package com.example.ivocosta.restmocker;
 
+import com.example.ivocosta.restmocker.model.ApiFactory;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.handlers.PathHandler;
@@ -19,7 +20,7 @@ public class RestMocker {
 
         DeploymentInfo servletBuilder = Servlets.deployment();
 
-        InstanceFactory<ServletContainer> factory = new RestServletFactory();
+        InstanceFactory<ServletContainer> factory = new RestServletFactory(ApiFactory.getApi());
 
         servletBuilder
                 .setClassLoader(Application.class.getClassLoader())
