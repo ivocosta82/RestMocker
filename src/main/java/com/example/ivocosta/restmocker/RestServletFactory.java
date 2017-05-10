@@ -39,22 +39,44 @@ public class RestServletFactory implements InstanceFactory<ServletContainer> {
         Resource.Builder resourceBuilder = Resource.builder("rest");
 
         //TODO: use full API structure
-        ApiResource apiResource = definition.getResources().get(0);
 
-        Set<MethodDefinition> methodDefinitions = apiResource.getMethodDefinitions();
+        for(ApiResource apiResource : definition.getResources()) {
+//            buildResourceTree(resourceBuilder, apiResource);
+            Set<MethodDefinition> methodDefinitions = apiResource.getMethodDefinitions();
+            Resource.Builder subResource = Resource.builder(apiResource.getPath());
 
-        Resource.Builder subResource = resourceBuilder.addChildResource(apiResource.getPath());
+            for (MethodDefinition method : methodDefinitions) {
+                String response = method.getResponse();
 
-        for (MethodDefinition method : methodDefinitions) {
-            final String response = method.getResponse();
+                subResource.addMethod(method.getMethod().toString()).handledBy(new RestInflector(response));
 
-            subResource.addMethod(method.getMethod().toString()).handledBy(new Inflector<ContainerRequestContext, Response>() {
-                public Response apply(ContainerRequestContext containerRequestContext) {
-                    return Response.ok(response).build();
-                }
-            });
+            }
+
+
+            for(ApiResource resource : apiResource.getResources()) {
+                buildResourceTree(subResource, resource);
+            }
+
         }
 
         return resourceBuilder.build();
+    }
+
+    private void buildResourceTree(Resource.Builder resourceBuilder, ApiResource apiResource) {
+        Set<MethodDefinition> methodDefinitions = apiResource.getMethodDefinitions();
+        Resource.Builder subResource = Resource.builder(apiResource.getPath());
+
+        for (MethodDefinition method : methodDefinitions) {
+            String response = method.getResponse();
+
+            subResource.addMethod(method.getMethod().toString()).handledBy(new RestInflector(response));
+        }
+
+
+        for(ApiResource resource : apiResource.getResources()) {
+            buildResourceTree(subResource, resource);
+        }
+
+        resourceBuilder.addChildResource(subResource.build());
     }
 }

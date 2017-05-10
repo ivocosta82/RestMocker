@@ -9,12 +9,17 @@ import java.util.*;
  */
 public class ApiResource {
     private List<ApiResource> resources;
+
     private Set<MethodDefinition> methods;
     private String path;
 
     public ApiResource() {
         resources = new ArrayList<ApiResource>();
         methods = new HashSet<MethodDefinition>();
+    }
+
+    public void addResource(ApiResource resource) {
+        resources.add(resource);
     }
 
     public void addMethodDefinition(MethodDefinition definition) {
@@ -31,5 +36,13 @@ public class ApiResource {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public List<ApiResource> getResources() {
+        return resources;
+    }
+
+    public void setResources(List<ApiResource> resources) {
+        this.resources = resources;
     }
 }
