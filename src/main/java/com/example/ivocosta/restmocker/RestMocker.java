@@ -32,6 +32,7 @@ public class RestMocker {
 
         DeploymentManager manager = Servlets.defaultContainer().addDeployment(servletBuilder);
         manager.deploy();
+
         PathHandler path = Handlers.path(Handlers.redirect("/mss"))
                 .addPrefixPath("/mss", manager.start());
 

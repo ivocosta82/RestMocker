@@ -27,10 +27,13 @@ public class ApiFactory {
         MethodDefinition methodDef2 = new MethodDefinition();
         methodDef2.setMethod(Method.GET);
         methodDef2.addResponses(StatusCode.OK, "\"Hello from the API Again\"");
+//        MethodDefinition methodDef3 = new MethodDefinition();
+//        methodDef3.setMethod(Method.OPTIONS);
+//        methodDef3.addResponses(StatusCode.OK, "\"Hello from the API Again Options\"");
 
         resource2.addMethodDefinition(methodDef2);
+//        resource2.addMethodDefinition(methodDef3);
         resource.addResource(resource2);
-
 
         api.addResource(resource);
         return api;
