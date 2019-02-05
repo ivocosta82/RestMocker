@@ -1,4 +1,4 @@
-#Rest Mocker
+# Rest Mocker
 
 The objective of this project is to create an app that can read a RAML or OpenAPI definition and dynamically create
 mocked interfaces from the definition.
